@@ -27,14 +27,9 @@ class TestAddNote(TestCase):
             slug='author_slug',
             author=cls.author
         )
-        cls.user_note = Note.objects.create(
-            title=cls.TITLE,
-            text=cls.TEXT,
-            slug='user_slug',
-            author=cls.user
-        )
 
     def test_authorized_user_has_form_for_note(self):
+        """На страницы создания и редактирования заметки передаются формы."""
         for name, args in (
             ('notes:add', None),
             ('notes:edit', (self.author_note.slug,))
@@ -45,6 +40,11 @@ class TestAddNote(TestCase):
                 self.assertIsInstance(response.context['form'], NoteForm)
 
     def test_list_of_notes_contains_only_authors_notes(self):
+        """
+        Отдельная заметка передаётся на страницу со списком заметок.
+        В список заметок одного пользователя
+        не попадают заметки другого пользователя.
+        """
         for name, note_in_list in (
             (self.author_client, True),
             (self.user_client, False)
